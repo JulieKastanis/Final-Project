@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2" xmlns:kml="http://www.opengis.net/kml/2.2" xmlns:atom="http://www.w3.org/2005/Atom">
+<Document id="1hhMmQzqf5w84yiq0YrBbz9CN4u-_U4wT">
+	<name>GIS_Assignment1</name>
+	<description>Riparian zone for two collection points for Rotary Park, Wall Branch Creek System.</description>
+	<gx:CascadingStyle kml:id="__managed_style_596D1627981DD5E6A96E">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/rpc/cc/icon?color=1976d2&amp;id=2006&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>4.8</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_4612D164241DD5E6A96E">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/rpc/cc/icon?color=1976d2&amp;id=2006&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>3.2</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_2333A06F8B1DD5E6A96C">
+		<Style>
+			<IconStyle>
+				<scale>1.2</scale>
+				<Icon>
+					<href>https://earth.google.com/earth/rpc/cc/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>4.8</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<gx:CascadingStyle kml:id="__managed_style_18F604FCEA1DD5E6A96C">
+		<Style>
+			<IconStyle>
+				<Icon>
+					<href>https://earth.google.com/earth/rpc/cc/icon?color=1976d2&amp;id=2000&amp;scale=4</href>
+				</Icon>
+				<hotSpot x="64" y="128" xunits="pixels" yunits="insetPixels"/>
+			</IconStyle>
+			<LabelStyle>
+			</LabelStyle>
+			<LineStyle>
+				<color>ff2dc0fb</color>
+				<width>3.2</width>
+			</LineStyle>
+			<PolyStyle>
+				<color>40ffffff</color>
+			</PolyStyle>
+			<BalloonStyle>
+			</BalloonStyle>
+		</Style>
+	</gx:CascadingStyle>
+	<StyleMap id="__managed_style_3DCB8AA43E1DD5E6A96E">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_4612D164241DD5E6A96E</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_596D1627981DD5E6A96E</styleUrl>
+		</Pair>
+	</StyleMap>
+	<StyleMap id="__managed_style_054F2D30CE1DD5E6A96C">
+		<Pair>
+			<key>normal</key>
+			<styleUrl>#__managed_style_18F604FCEA1DD5E6A96C</styleUrl>
+		</Pair>
+		<Pair>
+			<key>highlight</key>
+			<styleUrl>#__managed_style_2333A06F8B1DD5E6A96C</styleUrl>
+		</Pair>
+	</StyleMap>
+	<Placemark id="0F2EDE96F71DD00B63A9">
+		<name>Downstream Site for SRBD Collection (36.4989464 , -87.2721828) </name>
+		<LookAt>
+			<longitude>-87.27218280642437</longitude>
+			<latitude>36.49894639402159</latitude>
+			<altitude>164.2681082816407</altitude>
+			<heading>149.6265455945225</heading>
+			<tilt>45.00002394108521</tilt>
+			<gx:fovy>35</gx:fovy>
+			<range>833.0655005083827</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_054F2D30CE1DD5E6A96C</styleUrl>
+		<Point>
+			<coordinates>-87.27082449101577,36.4999001452418,155.1238969070122</coordinates>
+		</Point>
+	</Placemark>
+	<Placemark id="0DAAFD64061DD0248205">
+		<name>Upstream Site for SRBD Collection (36.4985616 ,  -87.2698236)</name>
+		<LookAt>
+			<longitude>-87.26982357869107</longitude>
+			<latitude>36.49856156177864</latitude>
+			<altitude>179.4772827604958</altitude>
+			<heading>149.627563739888</heading>
+			<tilt>44.9995360579555</tilt>
+			<gx:fovy>35</gx:fovy>
+			<range>755.3157799040491</range>
+			<altitudeMode>absolute</altitudeMode>
+		</LookAt>
+		<styleUrl>#__managed_style_3DCB8AA43E1DD5E6A96E</styleUrl>
+		<Point>
+			<coordinates>-87.26923905746656,36.498894352578,160.0625890950386</coordinates>
+		</Point>
+	</Placemark>
+</Document>
+</kml>

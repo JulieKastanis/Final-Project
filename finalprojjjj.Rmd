@@ -1,0 +1,1080 @@
+
+<body style="background-color:lightblue;">
+
+---
+title: Is Red Coloration in Chrosomus erythrogaster an Honest Signal? <br><small>Advanced Data Analytics</small></br>
+author: "Austin Peay State University"
+output:
+  html_notebook:
+    df_print: paged
+    rows.print: 10
+    theme: cosmo
+    highlight: breezedark
+    number_sections: yes
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+  pdf_document: default
+  html_document: 
+    df_print: paged
+    rows.print: 10
+    theme: cosmo
+    highlight: breezedark
+    number_sections: yes
+    toc: yes
+    toc_float:
+      collapsed: no
+      smooth_scroll: yes
+editor_options:
+  chunk_output_type: inline
+  mode: gfm
+---
+```{=html}
+<style type="text/css">
+
+h1.title {
+  font-size: 40px;
+  font-family: "Times New Roman", Times, serif;
+  color: Black;
+  text-align: center;
+}
+
+h4.author { /* Header 4 - and the author and data headers use this too  */
+  font-size: 25px;
+  font-family: "Times New Roman", Times, serif;
+  font-weight: bold;
+  color: #D02349;
+  text-align: center;
+}
+
+body {
+  font-family: Helvetica;
+  font-size: 12pt;
+}
+
+.zoom {
+  transform-origin: 40% 50% 0;
+  transition: transform .2s;
+  margin: 0 auto;
+}
+.zoom img{
+	width:auto;
+	height:auto;	
+}
+.zoom:hover {
+  transform: scale(2);
+}
+
+th, td {padding: 5px;}
+
+</style>
+```
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r library, include=FALSE}
+library(tidyverse)
+library(knitr) #making tables
+library(leaflet)
+library(tinytex) #may need for knitting pdf versions of .rmd file
+library(ggplot2)
+library(data.table)
+library(lme4)
+library(emmeans)
+library(performance)
+library(ggplot2)
+library(see)
+library(patchwork)
+library(pbkrtest)
+library(ggtext)
+library(asbio)
+library(ggfortify)
+library(bootstrap)
+library(GGally)
+library(MuMIn)
+library(readr)
+library(data.table)
+library(tidyverse)
+library(lmerTest)
+library(emmeans)
+library(ggsn)
+library(mapdata)
+library(maptools)
+library(rgdal)
+
+```
+
+```{r SRBD Site Map}
+leaflet() %>%
+  setView(-86.854396, 36.26361 , zoom = 16) %>% #lat-long of the place of interest
+  addTiles() %>%
+  addProviderTiles('Esri.WorldImagery') %>%
+  addMarkers(-86.854396, 36.26361 , popup = "Dry Fork, Whites Creek System")
+```
+
+
+
+```{r SRBD Site Map2}
+leaflet() %>%
+  setView(-87.287965, 36.499277 , zoom = 16) %>% #lat-long of the place of interest
+  addTiles() %>%
+  addProviderTiles('Esri.WorldImagery') %>%
+  addMarkers(-87.287965, 36.499277 , popup = "Rotary Park, Wall Branch Creek System")
+```
+
+```{r read kml_sites_srbd, include=FALSE}
+Sites <- readOGR("./GIS_Assignment3.kml")
+```
+
+
+
+```{r read Site_ThesisData1, include=FALSE}
+Thesis_Data <- read.csv("Thesis_Data1.csv")
+```
+
+```{r modelselection__GSI2}
+model10 <- lm(GSI_Value~Chroma_Gill + Sat_Gill, data = Thesis_Data)
+model18 <- lm(GSI_Value~Chroma_Gill + Tint_Gill, data = Thesis_Data)
+```
+
+
+```{r anova_chroma_tint}
+anova(model18)
+summary(model18)
+```
+
+
+```{r anova_summary_chroma_Sat}
+anova(model10)
+summary(model10)
+```
+
+```{r model_selection_output_GSI2}
+out.put1<-model.sel(model10, model18)
+out.put1
+```
+
+
+Low delta <2 for both.
+Model 10 which includes both Chroma_Gill and Saturation_Gill is about 1.32 times more likely than model 18 which contains Chroma_Gill and Tint_Gill.
+
+
+```{r importance_model_output1_2}
+importance(out.put1)
+```
+Here are the importance values of each of the variables used in the model selection.Chroma_Gill carrying most of that weight. 
+
+
+
+Now to average the models using the lm from out.put1: 
+
+```{r model_avg_output1_GSI_Value2}
+model.avg(out.put1, revised.var = TRUE)
+```
+
+```{r summary model_avg_output1_GSI_Value2}
+summary(model.avg(out.put1))
+```
+
+
+```{r chroma_sat}
+p1c <- ggplot(Thesis_Data, aes(Chroma_Gill + Sat_Gill, GSI_Value)) + 
+  geom_point(size=3) +
+  geom_smooth(method="lm")
+
+p1c
+```
+
+```{r chroma_tint}
+p1c <- ggplot(Thesis_Data, aes(Chroma_Gill + Tint_Gill, GSI_Value)) + 
+  geom_point(size=3) +
+  geom_smooth(method="lm")
+
+p1c
+```
+
+
+```{r ggplot_Chroma, fig.height=10, fig.width=6}
+wchroma <- ggplot(Thesis_Data, aes(Chroma_Gill, GSI_Value)) + 
+  geom_point() +
+  geom_smooth(method="lm")
+
+
+wtint <- ggplot(Thesis_Data, aes(Tint_Gill, GSI_Value)) + 
+  geom_point() +
+  geom_smooth(method="lm")
+
+wsat <- ggplot(Thesis_Data, aes(Sat_Gill, GSI_Value)) + 
+  geom_point() +
+  geom_smooth(method="lm")
+
+wchroma / wtint / wsat
+```
+
+
+Binary Data Below....
+
+
+
+```{r read Site_GSI_Data}
+Site_GSI <- read.csv("Site_GSI.csv")
+```
+
+
+```{r fit.1}
+fit.1 <- glm(Site_Location~GSI_Value, data=Site_GSI, binomial(link="logit"))
+
+anova(fit.1)
+```
+
+```{r fit.1_summary}
+summary(fit.1)
+```
+```{r autoplot_fit.1}
+autoplot(fit.1)
+
+```
+library(arm)
+
+
+
+```{r binnedplot_fit.1}
+library(arm)
+x <- predict(fit.1)
+y <- resid(fit.1)
+binnedplot(x, y)
+```
+#The results of the binnedplot, show that binned residuals of this data do not present good binary data. #The binned residual plot is used to view points that fall into +/- 2 standard errors; ~95% of the binned residuals.
+
+
+
+```{r coeff_fit1}
+coef(fit.1)
+```
+
+```{r coefint_fit1}
+confint(fit.1)
+```
+
+
+```{r Binary_Site_GSI}
+ggplot(Site_GSI, aes(GSI_Value,Site_Location)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Gonadosomatic Index (GSI)") +
+  ylab ("Site") +
+  labs (title="Raw Fit: 0=Rotary Park, 1=Dry Fork")
+```
+
+
+```{r read Site_BCF_Data}
+Site_BCF <- read.csv("Site_BCF.csv")
+```
+
+
+```{r fit.2}
+fit.2 <- glm(Site_Location~Body_Condition_Factor, data=Site_BCF, binomial(link="logit"))
+
+anova(fit.2)
+```
+
+```{r fit.2_summary}
+summary(fit.2)
+```
+
+
+```{r autoplot_fit.2}
+autoplot(fit.2)
+
+```
+
+```{r binnedplot_fit.2}
+x <- predict(fit.2)
+y <- resid(fit.2)
+binnedplot(x, y)
+```
+
+```{r coeff_fit.2}
+coef(fit.2)
+```
+
+```{r coefint_fit.2}
+confint(fit.2)
+```
+
+```{r Binary_Site_BCF}
+ggplot(Site_BCF, aes(Body_Condition_Factor,Site_Location)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Body Condition Factor") +
+  ylab ("Site") +
+  labs (title="Raw Fit: 0=Rotary Park, 1=Dry Fork")
+```
+
+
+```{r read Season_GSI_Data}
+Season_GSI <- read.csv("Season_GSI.csv")
+```
+
+
+```{r fit.3}
+fit.3 <- glm(Season_Collected~GSI_Value, data=Season_GSI, binomial(link="logit"))
+anova(fit.3)
+```
+
+
+```{r fit.3_summary}
+summary(fit.3)
+```
+
+
+```{r autoplot_fit.3}
+autoplot(fit.3)
+```
+
+```{r binnedplot_fit.3}
+x <- predict(fit.3)
+y <- resid(fit.3)
+binnedplot(x, y)
+```
+
+```{r coeff_fit3}
+coef(fit.3)
+```
+
+```{r coefint_fit3}
+confint(fit.3)
+```
+
+```{r Binary_Site_GSI_Season}
+ggplot(Season_GSI, aes(GSI_Value,Season_Collected)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Gonadosomatic Index (GSI)") +
+  ylab ("Season Collected") +
+  labs (title="Raw Fit: 0=Non-breeding Season, 1=Breeding Season")
+```
+
+```{r invlogit_fit.3}
+invlogit <- function(x) {1 / ( 1+exp(-x) ) } 
+invlogit(coef(fit.3))
+```
+
+```{r read Season_BCF}
+Season_BCF <- read.csv("Season_BCF.csv")
+```
+
+
+```{r fit.4}
+fit.4 <- glm(Season_Collected~Body_Condition_Factor, data=Season_BCF, binomial(link="logit"))
+
+anova(fit.4)
+```
+
+```{r fit.4_summary}
+summary(fit.4)
+```
+
+```{r autoplot_fit.4}
+autoplot(fit.4)
+
+```
+
+
+```{r binnedplot_fit.4}
+x <- predict(fit.4)
+y <- resid(fit.4)
+binnedplot(x, y)
+```
+
+```{r coeff}
+coef(fit.4)
+```
+
+```{r coefint}
+confint(fit.4)
+```
+
+```{r Binary_Site_BCF_Season}
+ggplot(Season_BCF, aes(Body_Condition_Factor,Season_Collected)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Body Condition Factor (BCF)") +
+  ylab ("Season Collected") +
+  labs (title="Raw Fit: 0=Non-breeding Season, 1=Breeding Season")
+```
+
+```{r invlogit_fit.4}
+invlogit <- function(x) {1 / ( 1+exp(-x) ) } 
+invlogit(coef(fit.4))
+```
+INTERPRET
+
+
+#The R output for the boxcox() function plots the maximum likelihood surface (the curve) together with a maximum likelihood-based 95% CI (Hector, 2015)
+
+#Helpful GLM component info from Hector, 2015 Ch8 
+
+#GLMs have three components:
+# 1.) a linear predictor- is what comes after the tilde (~) in our linear model formula
+# 2.) a variance function - models the variation in the data;make use of a much wider rangefamily of distributions including the poisson, the binomial, and the gamma. 
+#3.) a link function- plays a role equivalent to the transformation in normal least squares models. However, rather than transforming the data we transform the predictions made by the linear predictor. Commonly used link functions include the log, square root, and logistic.
+
+
+```{r read Season_BCF_Data}
+Season_BCF <- read.csv("Season_BCF.csv")
+```
+
+```{r read Sex_Data}
+sex <- read.csv("sex.csv")
+```
+
+```{r Binary_Sex_BCF}
+ggplot(sex, aes(Body_Condition_Factor, Sex)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Body Condition Factor") +
+  ylab ("Sex") +
+  labs (title="Raw Fit: 0=Female, 1=Male")
+```
+
+```{r sex_BCF}
+fit.5 <- glm(Sex~Body_Condition_Factor, data=sex, binomial(link="logit"))
+```
+
+```{r anova fit.5}
+anova(fit.5)
+summary(fit.5)
+```
+
+
+```{r Binary_Sex_GSI}
+ggplot(sex, aes(GSI_Value, Sex)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("GSI") +
+  ylab ("Sex") +
+  labs (title="Raw Fit: 0=Female, 1=Male")
+```
+```{r sex_GSI}
+fit.6 <- glm(Sex~GSI_Value, data=sex, binomial(link="logit"))
+```
+
+```{r anova fit.6}
+anova(fit.6)
+summary(fit.6)
+```
+
+
+```{r  autoplot_Fitsex_GSI}
+autoplot(fit.6)
+```
+
+
+
+
+```{r Binary_Sex_Whiteness1}
+ggplot(sex, aes(Whiteness_Gill,Sex)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Whiteness") +
+  ylab ("Sex") +
+  labs (title="Raw Fit: 0=Female, 1=Male")
+```
+
+
+```{r sex_whit}
+fit.7 <- glm(Sex~Whiteness_Gill, data=sex, binomial(link="logit"))
+```
+
+```{r anova fit.7}
+anova(fit.7)
+summary(fit.7)
+```
+
+
+```{r Binary_Sex_Sat1}
+ggplot(sex, aes(Sat_Gill,Sex)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Saturation") +
+  ylab ("Sex") +
+  labs (title="Raw Fit: 0=Female, 1=Male")
+```
+
+
+```{r sex_sat}
+fit.8 <- glm(Sex~Sat_Gill, data=sex, binomial(link="logit"))
+```
+
+```{r anova fit.8}
+anova(fit.8)
+summary(fit.8)
+```
+
+
+
+```{r Binary_Sex_area1}
+ggplot(sex, aes(Red_Coloration_Area,Sex)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Red Coloration Area") +
+  ylab ("Sex") +
+  labs (title="Raw Fit: 0=Female, 1=Male")
+```
+```{r sex_area}
+fit.9 <- glm(Sex~Red_Coloration_Area, data=sex, binomial(link="logit"))
+```
+
+```{r anova fit.9}
+anova(fit.9)
+summary(fit.9)
+```
+
+
+```{r Binary_Sex_chroma1}
+ggplot(sex, aes(Chroma_Gill,Sex)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Chroma") +
+  ylab ("Sex") +
+  labs (title="Raw Fit: 0=Female, 1=Male")
+```
+
+
+```{r sex_chrom}
+fit.10 <- glm(Sex~Chroma_Gill, data=sex, binomial(link="logit"))
+```
+
+```{r anova fit.10}
+anova(fit.10)
+summary(fit.10)
+```
+
+```{r Binary_Sex_tint1}
+ggplot(sex, aes(Tint_Gill,Sex)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Tint") +
+  ylab ("Sex") +
+  labs (title="Raw Fit: 0=Female, 1=Male")
+```
+
+```{r sex_tint}
+fit.11 <- glm(Sex~Tint_Gill, data=sex, binomial(link="logit"))
+```
+
+```{r anova fit.11}
+anova(fit.11)
+summary(fit.11)
+```
+
+```{r sex_domwave}
+fit.12 <- glm(Sex~DominantWavelength_Gill_nm, data=sex, binomial(link="logit"))
+```
+
+```{r anova fit.12}
+anova(fit.12)
+summary(fit.12)
+```
+
+
+NOTE 9 MALES VS. 18 FEMALES SEXED
+
+
+Binary Data: Season
+
+```{r read Season_Data}
+season <- read.csv("season.csv")
+```
+
+
+
+```{r season_whiteness_glm}
+season_whiteness <- glm(Season_Collected~Whiteness_Gill, data=season, binomial(link="logit"))
+
+anova(season_whiteness)
+```
+
+```{r season_whiteness_summary}
+summary(season_whiteness)
+```
+
+```{r autoplot_season_whiteness}
+autoplot(season_whiteness)
+
+```
+
+
+```{r binnedplot_season_whiteness}
+x <- predict(season_whiteness)
+y <- resid(season_whiteness)
+binnedplot(x, y)
+```
+
+```{r coeff_season_whiteness}
+coef(season_whiteness)
+```
+
+```{r coefint_season_whiteness}
+confint(season_whiteness)
+```
+
+```{r Binary_Season_whiteness2}
+ggplot(season, aes(Whiteness_Gill, Season_Collected)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Whiteness") +
+  ylab ("Season Collected") +
+  labs (title="Raw Fit: 0=Non-breeding, 1=Breeding")
+```
+
+
+```{r season_sat}
+season_sat <- glm(Season_Collected~Sat_Gill, data=season, binomial(link="logit"))
+
+anova(season_sat)
+```
+
+```{r season_sat_summary}
+summary(season_sat)
+```
+
+```{r autoplot_season_sat}
+autoplot(season_sat)
+
+```
+
+
+```{r binnedplot_season_sat}
+x <- predict(season_sat)
+y <- resid(season_sat)
+binnedplot(x, y)
+```
+
+```{r coeff_season_sat}
+coef(season_sat)
+```
+
+```{r coefint_season_sat}
+confint(season_sat)
+```
+
+```{r Binary_Season_sat}
+ggplot(season, aes(Sat_Gill, Season_Collected)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Saturation") +
+  ylab ("Season Collected") +
+  labs (title="Raw Fit: 0=Non-breeding, 1=Breeding")
+```
+
+
+```{r season_chroma}
+season_chroma <- glm(Season_Collected~Chroma_Gill, data=season, binomial(link="logit"))
+
+anova(season_chroma)
+```
+
+```{r season_chroma_summary}
+summary(season_chroma)
+```
+
+```{r autoplot_season_chroma}
+autoplot(season_chroma)
+
+```
+
+
+```{r binnedplot_season_chroma}
+x <- predict(season_chroma)
+y <- resid(season_chroma)
+binnedplot(x, y)
+```
+
+```{r coeff_season_chroma}
+coef(season_chroma)
+```
+
+```{r coefint_season_chroma}
+confint(season_chroma)
+```
+
+```{r Binary_Season_chroma}
+ggplot(season, aes(Chroma_Gill, Season_Collected)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Chroma") +
+  ylab ("Season Collected") +
+  labs (title="Raw Fit: 0=Non-breeding, 1=Breeding")
+```
+
+
+```{r season_tint}
+season_tint <- glm(Season_Collected~Tint_Gill, data=season, binomial(link="logit"))
+
+anova(season_tint)
+```
+
+```{r season_tint_summary}
+summary(season_tint)
+```
+
+```{r autoplot_season_tint}
+autoplot(season_tint)
+
+```
+
+
+```{r binnedplot_season_tint}
+x <- predict(season_tint)
+y <- resid(season_tint)
+binnedplot(x, y)
+```
+
+```{r coeff_season_tint}
+coef(season_tint)
+```
+
+```{r coefint_season_tint}
+confint(season_tint)
+```
+
+```{r Binary_Season_tint}
+ggplot(season, aes(Tint_Gill, Season_Collected)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Tint") +
+  ylab ("Season Collected") +
+  labs (title="Raw Fit: 0=Non-breeding, 1=Breeding")
+```
+
+
+```{r season_area}
+season_area <- glm(Season_Collected~Red_Coloration_Area, data=season, binomial(link="logit"))
+
+anova(season_area)
+```
+
+```{r season_area_summary}
+summary(season_area)
+```
+
+
+```{r Binary_Season_area}
+ggplot(season, aes(Red_Coloration_Area, Season_Collected)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Red Coloration Area") +
+  ylab ("Season Collected") +
+  labs (title="Raw Fit: 0=Non-breeding, 1=Breeding")
+```
+
+
+Lastly Site
+
+```{r read Site_Data}
+site <- read.csv("site.csv")
+```
+
+
+```{r site_whiteness}
+site_whiteness <- glm(Site_Location~Whiteness_Gill, data=site, binomial(link="logit"))
+
+anova(site_whiteness)
+```
+
+```{r site_whiteness_summary}
+summary(site_whiteness)
+```
+
+
+```{r Binary_Site_whiteness}
+ggplot(site, aes(Whiteness_Gill, Site_Location)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Whiteness") +
+  ylab ("Site") +
+  labs (title="Raw Fit:  0=Rotary Park, 1=Dry Fork")
+```
+
+
+```{r site_sat}
+site_sat <- glm(Site_Location~Sat_Gill, data=site, binomial(link="logit"))
+
+anova(site_sat)
+```
+
+```{r site_sat_summary}
+summary(site_sat)
+```
+
+
+
+```{r Binary_Site_sat}
+ggplot(site, aes(Sat_Gill, Site_Location)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Saturation") +
+  ylab ("Site") +
+  labs (title="Raw Fit:  0=Rotary Park, 1=Dry Fork")
+```
+
+```{r site_chroma}
+site_chroma <- glm(Site_Location~Chroma_Gill, data=site, binomial(link="logit"))
+
+anova(site_chroma)
+```
+
+```{r site_chroma_summary}
+summary(site_chroma)
+```
+
+
+```{r Binary_Site_chroma}
+ggplot(site, aes(Chroma_Gill, Site_Location)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Chroma") +
+  ylab ("Site") +
+  labs (title="Raw Fit:  0=Rotary Park, 1=Dry Fork")
+```
+
+
+
+```{r site_area}
+site_area <- glm(Site_Location~Red_Coloration_Area, data=site, binomial(link="logit"))
+
+anova(site_area)
+```
+
+```{r site_area_summary}
+summary(site_area)
+```
+
+```{r autoplot_site_area}
+autoplot(site_area)
+
+```
+
+
+```{r binnedplot_site_area}
+x <- predict(site_area)
+y <- resid(site_area)
+binnedplot(x, y)
+```
+
+```{r coeff_site_area}
+coef(site_area)
+```
+
+```{r coefint_site_area}
+confint(site_area)
+```
+
+```{r Binary_Site_area}
+ggplot(site, aes(Red_Coloration_Area, Site_Location)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Red Coloration Area") +
+  ylab ("Site") +
+  labs (title="Raw Fit:  0=Rotary Park, 1=Dry Fork")
+```
+
+
+
+```{r site_tint}
+site_tint <- glm(Site_Location~Tint_Gill, data=site, binomial(link="logit"))
+
+anova(site_tint)
+```
+
+```{r site_tint_summary}
+summary(site_tint)
+```
+
+
+
+```{r Binary_Site_tint}
+ggplot(site, aes(Tint_Gill, Site_Location)) +
+  geom_point() +
+  geom_smooth(method="glm", method.args=list(family="binomial"(link="logit"))) +
+  xlab ("Tint") +
+  ylab ("Site") +
+  labs (title="Raw Fit:  0=Rotary Park, 1=Dry Fork")
+```
+
+
+```{r boxplot_season_tint}
+boxplot(Tint_Gill~Season_Collected, data=season)
+```
+
+```{r t-test season-tint}
+
+tint_t <- t.test(Tint_Gill ~ Season_Collected, data = season, var.equal = TRUE)
+
+tint_t
+```
+
+
+```{r boxplot_season_sat}
+boxplot(Sat_Gill~Season_Collected, data=season)
+```
+
+
+
+```{r t-test season-sat}
+
+sat_t <- t.test(Sat_Gill ~ Season_Collected, data = season, var.equal = TRUE)
+
+sat_t
+```
+
+```{r boxplot_season_chroma}
+boxplot(Chroma_Gill~Season_Collected, data=season)
+```
+
+
+```{r t-test season-chroma}
+
+chroma_t <- t.test(Chroma_Gill ~ Season_Collected, data = season, var.equal = TRUE)
+
+chroma_t
+```
+
+```{r boxplot_season_whiteness}
+boxplot(Whiteness_Gill~Season_Collected, data=season)
+```
+
+
+```{r t-test season-whiteness}
+
+whiteness_t <- t.test(Whiteness_Gill ~ Season_Collected, data = season, var.equal = TRUE)
+
+whiteness_t
+```
+
+
+```{r boxplot_season_area}
+boxplot(Red_Coloration_Area~Season_Collected, data=season)
+```
+
+
+```{r t-test season-area}
+
+area_t <- t.test(Red_Coloration_Area ~ Season_Collected, data = season, var.equal = TRUE)
+
+area_t
+```
+
+```{r t-test sex-whiteness}
+
+whitenesssex_t <- t.test(Whiteness_Gill ~ Sex, data = sex, var.equal = TRUE)
+
+whitenesssex_t
+```
+
+
+```{r boxplot_sex_whiteness}
+boxplot(Whiteness_Gill~Sex, data=sex)
+```
+
+```{r t-test sex-chroma}
+
+chromasex_t <- t.test(Chroma_Gill ~ Sex, data = sex, var.equal = TRUE)
+
+chromasex_t
+```
+
+
+```{r boxplot_sex_chroma}
+boxplot(Chroma_Gill~Sex, data=sex)
+```
+
+```{r t-test sex-sat}
+
+satsex_t <- t.test(Sat_Gill ~ Sex, data = sex, var.equal = TRUE)
+
+satsex_t
+```
+
+
+```{r boxplot_sex_sat}
+boxplot(Sat_Gill~Sex, data=sex)
+```
+
+
+
+```{r t-test sex_tint}
+
+tintsex_t <- t.test(Tint_Gill ~ Sex, data = sex, var.equal = TRUE)
+
+tintsex_t
+```
+
+
+```{r boxplot_tint_sex}
+boxplot(Tint_Gill~Sex, data=sex)
+```
+
+
+```{r t-test sex_area}
+
+areasex_t <- t.test(Red_Coloration_Area ~ Sex, data = sex, var.equal = TRUE)
+
+areasex_t
+```
+
+
+```{r boxplot_sex_area}
+boxplot(Red_Coloration_Area~Sex, data=sex)
+```
+
+
+<!-- Main -->
+					<article id="main">
+						<header>
+							<h2>Graduate Research</h2>
+							<p>Is Red Coloration in Chrosomus erythrogaster an Honest Signal? </p>
+						</header>
+						<section class="wrapper style5">
+							<div class="inner">
+
+							
+
+							</div>
+						</section>
+					</article>
+
+				<!-- Footer -->
+					<footer id="footer">
+						<ul class="icons">
+							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>
+							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>
+							<li><a href="#" class="icon brands fa-dribbble"><span class="label">Dribbble</span></a></li>
+							<li><a href="#" class="icon solid fa-envelope"><span class="label">Email</span></a></li>
+						</ul>
+						<ul class="copyright">
+							<li>&copy; Untitled</li><li>Design: <a href="http://html5up.net">HTML5 UP</a></li>
+						</ul>
+					</footer>
+
+			</div>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrollex.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/browser.min.js"></script>
+			<script src="assets/js/breakpoints.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>
